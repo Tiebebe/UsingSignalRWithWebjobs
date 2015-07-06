@@ -1,0 +1,30 @@
+﻿@model Website.Models.JobStatusViewModel
+
+<h2>Status for Job @Model.JobId</h2>
+<p>Current progress: <span id="progress-span">0</span></p>
+
+@section scripts {
+    @Scripts.Render("~/bundles/jquery")
+    <script src="~/Scripts/jquery.signalR-2.2.0.min.js"></script>
+    <script src="~/signalr/hubs"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var jobId = "@Model.JobId";
+
+            // Reference the auto-generated proxy for the hub.
+            var jobProgressHub = $.connection.jobProgressHub;
+
+            // Create a function that the hub can call back to display progress
+            jobProgressHub.client.updateProgress = function(progress) {
+                $("#progress-span").text(progress);
+
+                console.log("Progress: " + progress);
+            };
+
+            $.connection.hub.logging = true;
+            $.connection.hub.qs = "jobId=" + jobId;
+            $.connection.hub.start();
+        });
+    </script>
+}
